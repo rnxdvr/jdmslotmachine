@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JDM Slots</title>
+  <style>
+    body {
+      background: #121212;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+      color: white;
+    }
+
+    .slot-machine {
+      text-align: center;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .header h1 {
+      font-size: 3em;
+      color: #ff4500; /* Оранжевый для JDM-темы */
+      margin: 0;
+    }
+
+    .header p {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+
+    .reels-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .reel {
+      width: 120px;
+      height: 360px; /* 3 символа по 120px */
+      background-color: #333;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 0 10px;
+      box-shadow: inset 0 10px 15px rgba(0, 0, 0, 0.3), inset 0 -10px 15px rgba(0, 0, 0, 0.3);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .symbol {
+      width: 120px;
+      height: 120px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.8;
+      transition: opacity 0.1s;
+    }
+
+    .symbol img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    .spin_btn {
+      background: #ff4500;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.5em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .spin_btn:hover {
+      background: #ff6347;
+    }
+
+    .message {
+      font-size: 1.5em;
+      color: #ffd700;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="slot-machine">
+    <div class="header">
+      <h1>JDM Slots</h1>
+      <p class="balance">Баланс: 1000</p>
+    </div>
+
+    <div class="reels-container">
+      <div class="reel" id="reel1"></div>
+      <div class="reel" id="reel2"></div>
+      <div class="reel" id="reel3"></div>
+    </div>
+
+    <div class="controls">
+      <button class="spin_btn">Крутить!</button>
+      <p class="message">Удачи!</p>
+    </div>
+  </div>
+
+  <script>
+    const symbols = [
+      { name: 'Supra', img: 'https://static0.carbuzzimages.com/wordpress/wp-content/uploads/gallery-images/original/1154000/700/1154749.jpg' }, // Toyota Supra MK4
+      { name: 'GT-R', img: 'https://s.yimg.com/ny/api/res/1.2/TUfhpyUMjo7OSnJIxh9CXg--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyNDI7aD02OTk-/https://media.zenfs.com/en/the_drive_634/180a901d58e4f30d5f7b46c49988bd6b' }, // Nissan GT-R R34
+      { name: 'NSX', img: 'https://motor283.com/uploads/articles/3033/motor283-the-top-5-legendary-jdm-sports-cars-169841500724.webp' }, // Honda NSX
+      { name: 'RX-7', img: 'https://www.slashgear.com/img/gallery/12-of-the-greatest-jdm-cars-of-the-90s/intro-1735000739.jpg' }, // Mazda RX-7
+      { name: 'Impreza', img: 'https://static0.hotcarsimages.com/wordpress/wp-content/uploads/2021/01/jdm1-e1610621817249.jpg?w=1200&h=628&fit=crop' }, // Subaru Impreza
+      { name: 'Evo', img: 'https://cdn.shopify.com/s/files/1/0659/4658/3275/files/The_Best_JDM_Cars_That_Changed_Automotive_History_4.png?v=1736354525' }, // Mitsubishi Lancer Evo
+      { name: 'Civic', img: 'https://static0.carbuzzimages.com/wordpress/wp-content/uploads/gallery-images/original/1191000/100/1191181.jpg?q=50&fit=crop&w=825&dpr=1.5' } // Honda Civic Type R
+    ];
+
+    const reels = document.querySelectorAll('.reel');
+    const spinButton = document.querySelector('.spin_btn');
+    const messageDisplay = document.querySelector('.message');
+    const balanceDisplay = document.querySelector('.balance');
+
+    let balance = 1000;
+    let betAmount = 10;
+    let spinning = false;
+
+    // Инициализация барабанов с случайными символами
+    let reelStates = Array.from({ length: 3 }, () => 
+      Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)])
+    );
+
+    function renderReel(reelIndex) {
+      const reel = reels[reelIndex];
+      reel.innerHTML = '';
+      reelStates[reelIndex].forEach(symbol => {
+        const div = document.createElement('div');
+        div.classList.add('symbol');
+        const img = document.createElement('img');
+        img.src = symbol.img;
+        img.alt = symbol.name;
+        div.appendChild(img);
+        reel.appendChild(div);
+      });
+    }
+
+    function initReels() {
+      reels.forEach((_, index) => renderReel(index));
+    }
+
+    function updateBalance() {
+      balanceDisplay.textContent = `Баланс: ${balance}`;
+    }
+
+    function spinReel(reelIndex) {
+      const spinCount = 20 + Math.floor(Math.random() * 10); // Больше спинов для эффекта
+      let currentSpin = 0;
+      const interval = setInterval(() => {
+        // Сдвиг символов вниз
+        reelStates[reelIndex].push(reelStates[reelIndex].shift());
+        renderReel(reelIndex);
+        currentSpin++;
+        if (currentSpin >= spinCount) {
+          clearInterval(interval);
+          if (reelIndex === 2) { // Последний барабан
+            spinning = false;
+            checkWin();
+          }
+        }
+      }, 50 + reelIndex * 50); // Задержка для каждого барабана
+    }
+
+    function placeBet() {
+      if (spinning || balance < betAmount) {
+        messageDisplay.textContent = balance < betAmount ? 'Недостаточно баланса!' : 'Подождите!';
+        return;
+      }
+      balance -= betAmount;
+      updateBalance();
+      spinning = true;
+      messageDisplay.textContent = 'Крутим...';
+      reels.forEach((_, index) => spinReel(index));
+    }
+
+    function checkWin() {
+      // Проверяем верхнюю и среднюю строки
+      const topRow = reelStates.map(reel => reel[0].name);
+      const middleRow = reelStates.map(reel => reel[1].name);
+
+      let win = false;
+      if (topRow.every(name => name === topRow[0]) || middleRow.every(name => name === middleRow[0])) {
+        const payout = betAmount * 5;
+        balance += payout;
+        messageDisplay.textContent = `Выигрыш: ${payout}!`;
+        win = true;
+      } else {
+        messageDisplay.textContent = 'Попробуй ещё!';
+      }
+      updateBalance();
+    }
+
+    spinButton.addEventListener('click', placeBet);
+    initReels();
+    updateBalance();
+  </script>
+</body>
+</html>
