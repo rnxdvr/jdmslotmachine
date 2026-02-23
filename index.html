@@ -3,55 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JDM Sluts</title>
+    <title>JDM SLUT Casino</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+
     <header>
-        <h1>JDM Slots Casino</h1>
-        <div id="balance-display">Баланс: <span id="balance">1000</span></div>
+        <h1>JDM SLUT CASINO</h1>
+        <div class="user-panel">
+            <div class="balance">БАЛАНС: <span id="balance">1000</span> ₽</div>
+            <button id="deposit-btn" class="deposit-button">Пополнить</button>
+        </div>
     </header>
 
-    <main class="slot-machine">
-        <div class="reels-container">
-            <div class="reel" id="reel-0"></div>
-            <div class="reel" id="reel-1"></div>
-            <div class="reel" id="reel-2"></div>
-            <div class="reel" id="reel-3"></div>
-            <div class="reel" id="reel-4"></div>
+    <main class="game-area">
+        <div class="slut-frame">
+            <div class="reels">
+                <div class="reel" id="reel0"></div>
+                <div class="reel" id="reel1"></div>
+                <div class="reel" id="reel2"></div>
+                <div class="reel" id="reel3"></div>
+                <div class="reel" id="reel4"></div>
+            </div>
         </div>
 
-        <div class="controls">
-            <button id="spin-btn">СПИН</button>
-            <button id="auto-btn">АВТО-СПИН</button>
-
-            <div class="bet-control">
-                <label>Ставка:</label>
+        <div class="control-panel">
+            <div class="bet-section">
                 <button id="bet-minus">-</button>
-                <span id="bet-value">10</span>
+                <div class="bet-display">
+                    СТАВКА<br><span id="bet">10</span>
+                </div>
                 <button id="bet-plus">+</button>
             </div>
 
-            <button id="payout-btn">ТАБЛИЦА ВЫПЛАТ</button>
+            <button id="spin" class="spin-button">SPIN</button>
+            <button id="auto" class="auto-button">AUTO</button>
+
+            <button id="payout-table-btn" class="info-button">?</button>
         </div>
     </main>
 
+    <!-- Модальное окно таблицы выплат -->
     <div id="modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal">×</span>
-            <h2>Таблица выплат</h2>
-            <table id="payout-table">
-                <thead>
-                    <tr>
-                        <th>Символ</th>
-                        <th>3×</th>
-                        <th>4×</th>
-                        <th>5×</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="modal-dialog">
+            <button class="close-modal">×</button>
+            <h2>ТАБЛИЦА ВЫПЛАТ</h2>
+            <div id="payout-content"></div>
+        </div>
+    </div>
+
+    <!-- Шуточное модальное окно привязки карты -->
+    <div id="deposit-modal" class="modal hidden">
+        <div class="card-binding-menu funny">
+            <h2>🍣 JDM Кард-Биндинг 極 Premium Edition 🍣</h2>
+            <p class="subtitle">Выбери свой путь к топливу для дрифта</p>
+
+            <div class="menu-options">
+                <div class="option premium">
+                    <div class="icon">🔥 TURBO</div>
+                    <h3>Привязать карту за 0.8 секунды</h3>
+                    <p>Как Supra на 2JZ-GTE с бустом 2.0 бара</p>
+                    <ul>
+                        <li>Мгновенная верификация</li>
+                        <li>Неоновая анимация успеха</li>
+                        <li>Бонус: +1000 виртуальных кредитов</li>
+                    </ul>
+                    <button id="deposit-turbo" class="btn">Привязать как босс</button>
+                </div>
+
+                <div class="option normal">
+                    <div class="icon">🚗 AE86</div>
+                    <h3>Обычная привязка (по-традиционному)</h3>
+                    <p>Как Така Фудзивара везёт тофу в гору</p>
+                    <ul>
+                        <li>Вводим номер, срок, CVV</li>
+                        <li>Ждём 3–7 рабочих дней подтверждения</li>
+                        <li>Без бонусов, без дрифта</li>
+                    </ul>
+                    <button id="deposit-normal" class="btn secondary">Привязать по-старинке</button>
+                </div>
+
+                <div class="option troll">
+                    <div class="icon">💸 3D-Secure Hell</div>
+                    <h3>Режим «Максимальная безопасность»</h3>
+                    <p>Банк пришлёт тебе 47 смс, 3 звонка и письмо от ретро</p>
+                    <ul>
+                        <li>Пароль из 128 символов</li>
+                        <li>Секретный вопрос: «Какой твой любимый JDM?»</li>
+                        <li>После привязки карта блокируется на всякий случай</li>
+                    </ul>
+                    <button id="deposit-troll" class="btn danger">Я мазохист, давай</button>
+                </div>
+            </div>
+
+            <div class="fine-print">
+                <small>На самом деле привязываем как нормальные люди.<br>
+                Но если выберешь «TURBO» — получишь конфетти и звук турбины 😏</small>
+            </div>
         </div>
     </div>
 

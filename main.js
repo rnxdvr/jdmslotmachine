@@ -1,61 +1,121 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- НАСТРОЙКИ ---
+    // ────────────────────────────────────────────────
+    //  КОНФИГ
+    // ────────────────────────────────────────────────
     const SYMBOLS = [
-        { name: 'civic',   src: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=300', value: 10 },
-        { name: 'skyline', src: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=300', value: 20 },
-        { name: 'supra',   src: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=300', value: 30 },
-        { name: 'rx7',     src: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=300', value: 40 },
-        { name: 'impreza', src: 'https://images.unsplash.com/photo-1580274455191-1c62238fa333?w=300', value: 50 },
-        { name: 'evo',     src: 'https://images.unsplash.com/photo-1583121274602-89a6c0a3a0d3?w=300', value: 60 },
-        { name: 'wild',    src: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=300', value: 0, isWild: true },
-        { name: 'scatter', src: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=300', value: 0, isScatter: true }
+        { name: 'civic',   src: 'https://s0.rbk.ru/v6_top_pics/media/img/8/37/755335712435378.jpg', value: 8  },
+        { name: 'skyline', src: 'https://japan-motor.com/storage/app/uploads/public/609/d80/660/609d806607d6b060370386.jpg', value: 12 },
+        { name: 'supra',   src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Anthro_vixen_colored.jpg/250px-Anthro_vixen_colored.jpg', value: 20 },
+        { name: 'rx7',     src: 'https://i.redd.it/x8c9jqsaucx91.jpg', value: 30 },
+        { name: 'impreza', src: 'https://i.ebayimg.com/00/s/MTU0NFgxMTU4/z/TGkAAOSwRjVjfgUs/$_57.JPG?set_id=880000500F', value: 45 },
+        { name: 'evo',     src: 'https://static0.hotcarsimages.com/wordpress/wp-content/uploads/2021/08/s2k.jpg?w=1200&h=628&fit=crop', value: 60 },
+        { name: 'silvia',  src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTXYCLTgqjuYsBUq629jPvqSMBvOGBZSrXSw&s', value: 80 },
+        { name: 'wild',    src: 'https://images.unsplash.com/photo-1581092160607-8a6a646d3b15?auto=format&fit=crop&q=80&w=800', value: 0,  wild: true   },
+        { name: 'scatter', src: 'https://images.pexels.com/photos/1632790/pexels-photo-1632790.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2', value: 0,  scatter: true }
     ];
+
+    const REEL_COUNT = 5;
+    const VISIBLE_ROWS = 3;
+    const SYMBOL_HEIGHT = 160;
+    const SPIN_DURATION = 3200;
 
     let balance = 1000;
     let bet = 10;
     let isSpinning = false;
-    let autoSpin = false;
+    let autoMode = false;
 
-    const balanceEl     = document.getElementById('balance');
-    const betEl         = document.getElementById('bet-value');
-    const spinBtn       = document.getElementById('spin-btn');
-    const autoBtn       = document.getElementById('auto-btn');
-    const betMinus      = document.getElementById('bet-minus');
-    const betPlus       = document.getElementById('bet-plus');
-    const payoutBtn     = document.getElementById('payout-btn');
-    const modal         = document.getElementById('modal');
-    const closeModal    = document.querySelector('.close-modal');
+    // Элементы
+    const balanceEl   = document.getElementById('balance');
+    const betEl       = document.getElementById('bet');
+    const spinBtn     = document.getElementById('spin');
+    const autoBtn     = document.getElementById('auto');
+    const minusBtn    = document.getElementById('bet-minus');
+    const plusBtn     = document.getElementById('bet-plus');
+    const infoBtn     = document.getElementById('payout-table-btn');
+    const modal       = document.getElementById('modal');
+    const closeModal  = document.querySelector('.close-modal');
+    const payoutDiv   = document.getElementById('payout-content');
 
-    const reels = Array.from({ length: 5 }, (_, i) => document.getElementById(`reel-${i}`));
+    const depositBtn = document.getElementById('deposit-btn');
+    const depositModal = document.getElementById('deposit-modal');
+    const depositTurbo = document.getElementById('deposit-turbo');
+    const depositNormal = document.getElementById('deposit-normal');
+    const depositTroll = document.getElementById('deposit-troll');
 
-    // --- ФУНКЦИИ UI ---
+    const reels = Array.from({length: REEL_COUNT}, (_, i) => document.getElementById(`reel${i}`));
+
+    // ────────────────────────────────────────────────
+    //  ТАБЛИЦА ВЫПЛАТ
+    // ────────────────────────────────────────────────
+    function generatePayoutTable() {
+        let html = '<table><thead><tr><th>Символ</th><th>3×</th><th>4×</th><th>5×</th></tr></thead><tbody>';
+
+        SYMBOLS.forEach(s => {
+            if (s.wild || s.scatter) return;
+            const payout3 = s.value * 3;
+            const payout4 = s.value * 5;
+            const payout5 = s.value * 10;
+            html += `
+                <tr>
+                    <td><div class="symbol-preview" style="background-image:url(${s.src})"></div></td>
+                    <td>${payout3}</td>
+                    <td>${payout4}</td>
+                    <td>${payout5}</td>
+                </tr>`;
+        });
+
+        html += `
+            <tr>
+                <td>Scatter (флаг) в любом месте</td>
+                <td>15×</td>
+                <td>30×</td>
+                <td>100×</td>
+            </tr>
+            <tr>
+                <td>Wild (турбо) заменяет любой</td>
+                <td colspan="3">×2 к выигрышу линии</td>
+            </tr>`;
+
+        html += '</tbody></table>';
+        payoutDiv.innerHTML = html;
+    }
+
+    // ────────────────────────────────────────────────
+    //  UI
+    // ────────────────────────────────────────────────
     function updateUI() {
-        balanceEl.textContent = balance;
+        balanceEl.textContent = Math.floor(balance);
         betEl.textContent = bet;
         spinBtn.disabled = isSpinning || balance < bet;
+        autoBtn.textContent = autoMode ? 'STOP AUTO' : 'AUTO';
     }
 
-    // --- ГЕНЕРАЦИЯ РЕЗУЛЬТАТА ---
-    function getRandomSymbol() {
-        return SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-    }
-
-    function spinReels() {
+    // ────────────────────────────────────────────────
+    //  СПИН
+    // ────────────────────────────────────────────────
+    function spin() {
         if (isSpinning || balance < bet) return;
 
         isSpinning = true;
         balance -= bet;
         updateUI();
 
-        reels.forEach(reel => {
-            reel.innerHTML = '';
-            const strip = Array(30).fill(0).map(() => getRandomSymbol()); // длинная лента для анимации
-            const final = Array(3).fill(0).map(() => getRandomSymbol());
+        const finalSymbols = Array(REEL_COUNT).fill().map(() =>
+            Array(VISIBLE_ROWS).fill().map(() => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)])
+        );
 
-            strip.push(...final);
+        reels.forEach((reel, i) => {
+            reel.innerHTML = '';
+
+            const strip = [];
+            // Длинная лента для красивого спина
+            for (let j = 0; j < 25; j++) {
+                strip.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
+            }
+            strip.push(...finalSymbols[i]);
 
             const inner = document.createElement('div');
-            inner.className = 'inner-reel';
+            inner.className = 'inner';
 
             strip.forEach(sym => {
                 const div = document.createElement('div');
@@ -66,37 +126,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
             reel.appendChild(inner);
 
-            // Запуск анимации
             setTimeout(() => {
-                inner.style.transform = `translateY(-${(strip.length - 3) * 140}px)`;
-            }, 100);
+                const shift = (strip.length - VISIBLE_ROWS) * SYMBOL_HEIGHT;
+                inner.style.transform = `translateY(-${shift}px)`;
+            }, 50 + i * 180);
         });
 
-        // Завершение спина через ~3 секунды
         setTimeout(() => {
             isSpinning = false;
             updateUI();
-            if (autoSpin) setTimeout(spinReels, 800);
-        }, 3200);
+            if (autoMode && balance >= bet) {
+                setTimeout(spin, 900);
+            }
+        }, SPIN_DURATION + 400);
     }
 
-    // --- СОБЫТИЯ ---
-    spinBtn.addEventListener('click', spinReels);
+    // ────────────────────────────────────────────────
+    //  СОБЫТИЯ
+    // ────────────────────────────────────────────────
+    spinBtn.addEventListener('click', spin);
 
     autoBtn.addEventListener('click', () => {
-        autoSpin = !autoSpin;
-        autoBtn.textContent = autoSpin ? 'СТОП АВТО' : 'АВТО-СПИН';
-        if (autoSpin && !isSpinning) spinReels();
+        autoMode = !autoMode;
+        updateUI();
+        if (autoMode && !isSpinning && balance >= bet) spin();
     });
 
-    betMinus.addEventListener('click', () => { if (bet > 1) bet = Math.max(1, bet - 5); updateUI(); });
-    betPlus.addEventListener('click',  () => { if (bet < 200) bet += 5; updateUI(); });
+    minusBtn.addEventListener('click', () => {
+        if (bet > 5) bet -= 5;
+        updateUI();
+    });
 
-    payoutBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+    plusBtn.addEventListener('click', () => {
+        if (bet < 200) bet += 5;
+        updateUI();
+    });
+
+    infoBtn.addEventListener('click', () => modal.classList.remove('hidden'));
     closeModal.addEventListener('click', () => modal.classList.add('hidden'));
     modal.addEventListener('click', e => {
         if (e.target === modal) modal.classList.add('hidden');
     });
 
+    // Логика для шуточного меню привязки карты
+    depositBtn.addEventListener('click', () => depositModal.classList.remove('hidden'));
+    depositModal.addEventListener('click', e => {
+        if (e.target === depositModal) depositModal.classList.add('hidden');
+    });
+
+    // Шуточное пополнение (виртуальное)
+    depositTurbo.addEventListener('click', () => {
+        balance += 1000;
+        updateUI();
+        depositModal.classList.add('hidden');
+        alert('Турбо-привязка удалась! +1000 кредитов. Вуууушшш! 🔥');
+    });
+
+    depositNormal.addEventListener('click', () => {
+        balance += 500;
+        updateUI();
+        depositModal.classList.add('hidden');
+        alert('Обычная привязка. +500 кредитов. Без фанатизма.');
+    });
+
+    depositTroll.addEventListener('click', () => {
+        balance += 100;
+        updateUI();
+        depositModal.classList.add('hidden');
+        alert('Мазохист-режим активирован. +100 кредитов. Но карта заблокирована на 24 часа... шутка!');
+    });
+
+    // Старт
+    generatePayoutTable();
     updateUI();
 });
